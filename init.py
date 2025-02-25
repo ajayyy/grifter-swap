@@ -113,7 +113,6 @@ async def create_message(message, coin1, coin2, coins_given, total_given_to_supp
         await message.reply(content=content)
     else:
         # Sent too little to convert
-        
         if transfer_amount - fees <= 0:
             content += f"\nNot sending your {coin1['emoji']} {coin1['name']} back due to {fees} {coin2['emoji']} {coin2['name']} transaction fee"
             await message.reply(content=content)
