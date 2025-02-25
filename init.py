@@ -178,8 +178,8 @@ def get_supply(coin_name):
             return coin["balance"]
         
 def make_chart():
-    data = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin2["name"]]).fetchall()
-    data2 = connection.execute("SELECT supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
+    data = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
+    data2 = connection.execute("SELECT supply FROM history WHERE coin_name = ? ORDER BY time", [coin2["name"]]).fetchall()
 
     chart_precision = update_time / 4
 
@@ -189,8 +189,8 @@ def make_chart():
         current_data_point = {
             "time": t,
             "price": price,
-            "dab_supply": supply,
-            "sb_supply": data2[index][0]
+            "dab_supply": data2[index][0],
+            "sb_supply": supply
         }
 
         if len(processed_data) > 0:
