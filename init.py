@@ -185,14 +185,35 @@ def make_chart():
     chart1.width = 500
     chart1.height = 300
     chart1.device_pixel_ratio = 2.0
+    chart1.background_color = "black"
     chart1.config = {
         "type": "line",
         "data": {
             "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)) for t, _, _ in data],
             "datasets": [{
                 "label": "SBCoin to DABCoin",
+                "borderColor": "#fecd4c",
                 "data": [price for _, price, _ in data],
             }]
+        },
+        "options": {
+            "legend": {
+                "labels": {
+                    "fontColor": "white"
+                }
+            },
+            "scales": {
+                "yAxes": [{
+                    "ticks": {
+                        "fontColor": "white"
+                    }
+                }],
+                "xAxes": [{
+                    "ticks": {
+                        "fontColor": "white"
+                    }
+                }]
+            }
         }
     }
 
@@ -200,17 +221,39 @@ def make_chart():
     chart2.width = 500
     chart2.height = 300
     chart2.device_pixel_ratio = 2.0
+    chart2.background_color = "black"
     chart2.config = {
         "type": "line",
         "data": {
             "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)) for t, _, _ in data],
             "datasets": [{
-                "label": "SBCoin supply",
-                "data": [supply for _, _, supply in data2],
-            },{
                 "label": "DABCoin supply",
+                "borderColor": "#3b3db0",
                 "data": [supply for _, _, supply in data],
+            },{
+                "label": "SBCoin supply",
+                "borderColor": "#ff0000",
+                "data": [supply for _, _, supply in data2],
             }]
+        },
+        "options": {
+            "legend": {
+                "labels": {
+                    "fontColor": "white"
+                }
+            },
+            "scales": {
+                "yAxes": [{
+                    "ticks": {
+                        "fontColor": "white"
+                    }
+                }],
+                "xAxes": [{
+                    "ticks": {
+                        "fontColor": "white"
+                    }
+                }]
+            }
         }
     }
 
