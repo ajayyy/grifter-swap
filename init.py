@@ -179,7 +179,37 @@ def get_supply(coin_name):
         
 def make_chart():
     data = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin2["name"]]).fetchall()
-    data2 = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
+    data2 = connection.execute("SELECT supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
+
+    processed_data = []
+    index = 0
+    for t, price, supply in data:
+        current_data_point = {
+            "time": t,
+            "price": price,
+            "dab_supply": supply,
+            "sb_supply": data2[index][0]
+        }
+
+        if len(processed_data) > 0:
+            while current_data_point["time"] - processed_data[-1]["time"] > update_time:
+                processed_data.append({
+                    "time": processed_data[-1]["time"] + update_time,
+                    "price": processed_data[-1]["price"],
+                    "dab_supply": processed_data[-1]["dab_supply"],
+                    "sb_supply": processed_data[-1]["sb_supply"]
+                })
+            
+            processed_data.append({
+                "time": processed_data[-1]["time"] + update_time,
+                "price": current_data_point["price"],
+                "dab_supply": current_data_point["dab_supply"],
+                "sb_supply": current_data_point["sb_supply"]
+            })
+        else:
+            processed_data.append(current_data_point)
+
+        index += 1
 
     chart1 = QuickChart()
     chart1.width = 500
@@ -189,12 +219,12 @@ def make_chart():
     chart1.config = {
         "type": "line",
         "data": {
-            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)) for t, _, _ in data],
+            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(d["time"])) for d in processed_data],
             "datasets": [{
                 "label": "SBCoin to DABCoin",
                 "borderColor": "#fecd4c",
                 "fill": False,
-                "data": [price for _, price, _ in data],
+                "data": [d["price"] for d in processed_data],
             }]
         },
         "options": {
@@ -233,17 +263,17 @@ def make_chart():
     chart2.config = {
         "type": "line",
         "data": {
-            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)) for t, _, _ in data],
+            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(d["time"])) for d in processed_data],
             "datasets": [{
                 "label": "DABCoin supply",
                 "borderColor": "#3b3db0",
                 "fill": False,
-                "data": [supply for _, _, supply in data],
+                "data": [d["dab_supply"] for d in processed_data],
             },{
                 "label": "SBCoin supply",
                 "borderColor": "#ff0000",
                 "fill": False,
-                "data": [supply for _, _, supply in data2],
+                "data": [d["sb_supply"] for d in processed_data],
             }]
         },
         "options": {
