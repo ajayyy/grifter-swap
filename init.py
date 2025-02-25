@@ -96,12 +96,13 @@ def get_conversion(transfer_amount: int, coin1, coin2, with_transaction_fee=True
 async def create_message(message, coin1, coin2, coins_given, total_given_to_suppliers: int):
     transfer_amount = coin1["get_transfer_amount"](message.content)
     fees = coin1["transaction_fee"](coins_given)
-    content = f"{transfer_amount} {coin1['emoji']} {coin1['name']} converted to {coins_given} {coin2['emoji']} {coin2['name']}\n{"{:.6f}".format(total_given_to_suppliers)} {coin2['emoji']} {coin2['name']} fee given to our generous suppliers"
+    content = f"{transfer_amount} {coin1['emoji']} {coin1['name']} converted to {coins_given} {coin2['emoji']} {coin2['name']}"
 
     if coins_given > 0 and coin2["balance"] >= coins_given:
         add_to_balance(coin1, transfer_amount)
         add_to_balance(coin2, - (coins_given + fees))
 
+        content += f"\n{"{:.6f}".format(total_given_to_suppliers)} {coin2['emoji']} {coin2['name']} fee given to our generous suppliers"
         await message.reply(content=content)
         await send(message, message.interaction.user, coin2, coins_given)
         
