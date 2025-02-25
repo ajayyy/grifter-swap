@@ -4,6 +4,7 @@ import time
 import yaml
 import discord
 import re
+from quickchart import QuickChart
 
 config = yaml.safe_load(open("config.yaml"))
 connection = sqlite3.connect("db/database.db")
@@ -174,6 +175,45 @@ def get_supply(coin_name):
     for coin in coins:
         if coin["name"] == coin_name:
             return coin["balance"]
+        
+def make_chart():
+    data = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin2["name"]]).fetchall()
+    data2 = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
+
+    chart1 = QuickChart()
+    chart1.width = 500
+    chart1.height = 300
+    chart1.device_pixel_ratio = 2.0
+    chart1.config = {
+        "type": "line",
+        "data": {
+            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)) for t, _, _ in data],
+            "datasets": [{
+                "label": "SBCoin to DABCoin",
+                "data": [price for _, price, _ in data],
+            }]
+        }
+    }
+
+    chart2 = QuickChart()
+    chart2.width = 500
+    chart2.height = 300
+    chart2.device_pixel_ratio = 2.0
+    chart2.config = {
+        "type": "line",
+        "data": {
+            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t)) for t, _, _ in data],
+            "datasets": [{
+                "label": "SBCoin supply",
+                "data": [supply for _, _, supply in data2],
+            },{
+                "label": "DABCoin supply",
+                "data": [supply for _, _, supply in data],
+            }]
+        }
+    }
+
+    return chart1.get_url(), chart2.get_url()
 
 @client.event
 async def on_ready():
@@ -197,8 +237,9 @@ async def on_message(message):
     elif message.content.startswith("!hodl"):
         price1 = get_conversion(1, coin1, coin2, with_transaction_fee=False, with_rounding=False)[0]
         price2 = get_conversion(1, coin2, coin1, with_transaction_fee=False, with_rounding=False)[0]
+        url1, url2 = make_chart()
 
-        await message.reply(content=f"1 {coin1['emoji']} {coin1['name']} is worth {"{:.4f}".format(price1)} {coin2['emoji']} {coin2['name']}\n1 {coin2['emoji']} {coin2['name']} is worth {"{:.4f}".format(price2)} {coin1['emoji']} {coin1['name']}\n\nThere are {coin1['balance']} {coin1['emoji']} {coin1['name']} and {coin2['balance']} {coin2['emoji']} {coin2['name']} in the swapping pool")
+        await message.reply(content=f"1 {coin1['emoji']} {coin1['name']} is worth {"{:.4f}".format(price1)} {coin2['emoji']} {coin2['name']}\n1 {coin2['emoji']} {coin2['name']} is worth {"{:.4f}".format(price2)} {coin1['emoji']} {coin1['name']}\n\nThere are {coin1['balance']} {coin1['emoji']} {coin1['name']} and {coin2['balance']} {coin2['emoji']} {coin2['name']} in the swapping pool\n-# [1]({url1}) [2]({url2})")
     elif message.content.startswith("!supply"):
         await message.reply(content=f"Anything you send in the next 30 seconds will be added to the supply. You will earn part of the {supply_fee * 100}% fee for each trade")
 
