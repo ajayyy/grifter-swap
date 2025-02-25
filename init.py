@@ -183,6 +183,9 @@ def make_chart():
 
     chart_precision = update_time / 4
 
+    data.append((time.time(), get_conversion(1, coin1, coin2, with_transaction_fee=False, with_rounding=False)[0], coin1["balance"]))
+    data2.append((coin2["balance"],))
+
     processed_data = []
     index = 0
     for t, price, supply in data:
