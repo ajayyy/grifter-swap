@@ -193,6 +193,7 @@ def make_chart():
             "datasets": [{
                 "label": "SBCoin to DABCoin",
                 "borderColor": "#fecd4c",
+                "fill": False,
                 "data": [price for _, price, _ in data],
             }]
         },
@@ -205,7 +206,8 @@ def make_chart():
             "scales": {
                 "yAxes": [{
                     "ticks": {
-                        "fontColor": "white"
+                        "fontColor": "white",
+                        "beginAtZero": True
                     }
                 }],
                 "xAxes": [{
@@ -229,10 +231,12 @@ def make_chart():
             "datasets": [{
                 "label": "DABCoin supply",
                 "borderColor": "#3b3db0",
+                "fill": False,
                 "data": [supply for _, _, supply in data],
             },{
                 "label": "SBCoin supply",
                 "borderColor": "#ff0000",
+                "fill": False,
                 "data": [supply for _, _, supply in data2],
             }]
         },
@@ -245,7 +249,8 @@ def make_chart():
             "scales": {
                 "yAxes": [{
                     "ticks": {
-                        "fontColor": "white"
+                        "fontColor": "white",
+                        "beginAtZero": True
                     }
                 }],
                 "xAxes": [{
