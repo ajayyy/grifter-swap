@@ -36,6 +36,9 @@ coins = [coin1, coin2]
 suppliers = {}
 commands = {}
 
+last_price_update = 0
+update_time = 60 * 60
+
 supplier_timeout = 30
 supply_fee = 0.05
 
@@ -44,10 +47,28 @@ coin1["balance"] = connection.execute("SELECT balance FROM coins WHERE name = ?"
 coin2["balance"] = connection.execute("SELECT balance FROM coins WHERE name = ?", [coin2["name"]]).fetchone()[0]
 connection.commit()
 
+def update_price_history():
+    global last_price_update
+    if time.time() - last_price_update > update_time:
+        last_price_update = time.time()
+
+        last_update_in_db = connection.execute("SELECT time FROM history ORDER BY time DESC LIMIT 1").fetchone()
+        if last_update_in_db and time.time() - last_update_in_db[0] < update_time:
+            return
+
+        price1 = get_conversion(1, coin1, coin2, with_transaction_fee=False, with_rounding=False)[0]
+        price2 = get_conversion(1, coin2, coin1, with_transaction_fee=False, with_rounding=False)[0]
+
+        connection.execute("INSERT INTO history (time, coin_name, price, supply) VALUES (?, ?, ?, ?)", (last_price_update, coin1["name"], price1, coin1["balance"]))
+        connection.execute("INSERT INTO history (time, coin_name, price, supply) VALUES (?, ?, ?, ?)", (last_price_update, coin2["name"], price2, coin2["balance"]))
+        connection.commit()
+
 def add_to_balance(coin, amount):
     coin["balance"] += amount
     connection.execute("UPDATE coins SET balance = ? WHERE name = ?", (coin["balance"], coin["name"]))
     connection.commit()
+
+    update_price_history()
 
 def get_conversion(transfer_amount: int, coin1, coin2, with_transaction_fee=True, with_rounding=True):
     if transfer_amount < 0:
@@ -149,6 +170,11 @@ def get_emoji(coin_name):
         if coin["name"] == coin_name:
             return coin["emoji"]
 
+def get_supply(coin_name):
+    for coin in coins:
+        if coin["name"] == coin_name:
+            return coin["balance"]
+
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user}')
@@ -172,7 +198,7 @@ async def on_message(message):
         price1 = get_conversion(1, coin1, coin2, with_transaction_fee=False, with_rounding=False)[0]
         price2 = get_conversion(1, coin2, coin1, with_transaction_fee=False, with_rounding=False)[0]
 
-        await message.reply(content=f"1 {coin1['emoji']} {coin1['name']} is worth {"{:10.4f}".format(price1)} {coin2['emoji']} {coin2['name']}\n1 {coin2['emoji']} {coin2['name']} is worth {"{:10.4f}".format(price2)} {coin1['emoji']} {coin1['name']}\n\nThere are {coin1['balance']} {coin1['emoji']} {coin1['name']} and {coin2['balance']} {coin2['emoji']} {coin2['name']} in the swapping pool")
+        await message.reply(content=f"1 {coin1['emoji']} {coin1['name']} is worth {"{:.4f}".format(price1)} {coin2['emoji']} {coin2['name']}\n1 {coin2['emoji']} {coin2['name']} is worth {"{:.4f}".format(price2)} {coin1['emoji']} {coin1['name']}\n\nThere are {coin1['balance']} {coin1['emoji']} {coin1['name']} and {coin2['balance']} {coin2['emoji']} {coin2['name']} in the swapping pool")
     elif message.content.startswith("!supply"):
         await message.reply(content=f"Anything you send in the next 30 seconds will be added to the supply. You will earn part of the {supply_fee * 100}% fee for each trade")
 
@@ -186,12 +212,12 @@ async def on_message(message):
         else:   
             await message.reply(content="You aren't a grifter yet")
     elif message.content.startswith("!suppliers"):
-        supply_info = connection.execute("SELECT coin_name, amount, fees_collected, userID FROM suppliers order by userID").fetchall()
+        supply_info = connection.execute("SELECT coin_name, amount, fees_collected, userID FROM suppliers order by coin_name").fetchall()
 
         content = ""
         for (coin_name, amount, fees_collected, user_id) in supply_info:
             if amount > 0 or fees_collected > 0:
-                content += f"<@{user_id}>: {amount} collecting fees worth {"{:.6f}".format(fees_collected)} in {get_emoji(coin_name)} {coin_name}\n"
+                content += f"<@{user_id}>: {amount} collecting fees worth {"{:.6f}".format(fees_collected)} in {get_emoji(coin_name)} {coin_name} ({"{:.2f}".format((amount / get_supply(coin_name)) * 100)}% of the supply)\n"
 
         await message.reply(content=content, allowed_mentions=discord.AllowedMentions.none())
 
