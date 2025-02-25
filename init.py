@@ -371,7 +371,9 @@ async def on_message(message):
             await message.reply(content="Invalid coin")
             return
         
-        withdraw_amount = int(args[2])
+        withdraw_ask_amount = int(args[2])
+        transaction_fee = coin["transaction_fee"](withdraw_ask_amount)
+        withdraw_amount = withdraw_ask_amount + transaction_fee
         if withdraw_amount <= 0:
             await message.reply(content="Amount must be greater than 0")
             return
@@ -394,9 +396,9 @@ async def on_message(message):
                 connection.commit()
 
             add_to_balance(coin, -withdraw_amount)
-            await message.reply(content=f"Withdrew {withdraw_amount} {coin['emoji']} {coin['name']} from the supply")
+            await message.reply(content=f"Withdrew {withdraw_amount} {coin['emoji']} {coin['name']} from the supply{f' with {transaction_fee} {coin["emoji"]} {coin["name"]} transaction fee' if transaction_fee else ''}")
 
-            await send(message, message.author, coin, withdraw_amount)
+            await send(message, message.author, coin, withdraw_ask_amount)
 
 @client.event
 async def on_raw_reaction_add(reaction):
