@@ -221,7 +221,7 @@ def make_chart():
     chart1.config = {
         "type": "line",
         "data": {
-            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(d["time"])) for d in processed_data],
+            "labels": [time.strftime("%m-%d", time.localtime(d["time"])) for d in processed_data],
             "datasets": [{
                 "label": "SBCoin to DABCoin",
                 "borderColor": "#fecd4c",
@@ -265,7 +265,7 @@ def make_chart():
     chart2.config = {
         "type": "line",
         "data": {
-            "labels": [time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(d["time"])) for d in processed_data],
+            "labels": [time.strftime("%m-%d", time.localtime(d["time"])) for d in processed_data],
             "datasets": [{
                 "label": "DABCoin supply",
                 "borderColor": "#3b3db0",
