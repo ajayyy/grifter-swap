@@ -164,4 +164,4 @@ config.yaml
 cache
 .vscode
 
-db
+db/database.db
