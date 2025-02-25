@@ -208,6 +208,11 @@ def make_chart():
                     "ticks": {
                         "fontColor": "white",
                         "beginAtZero": True
+                    },
+                    "gridLines": {
+                        "display": True,
+                        "color": "white",
+                        "zeroLineColor": "white"
                     }
                 }],
                 "xAxes": [{
@@ -251,6 +256,11 @@ def make_chart():
                     "ticks": {
                         "fontColor": "white",
                         "beginAtZero": True
+                    },
+                    "gridLines": {
+                        "display": True,
+                        "color": "white",
+                        "zeroLineColor": "white"
                     }
                 }],
                 "xAxes": [{
