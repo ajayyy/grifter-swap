@@ -272,7 +272,7 @@ def make_chart():
         }
     }
 
-    return chart1.get_url(), chart2.get_url()
+    return chart1.get_short_url(), chart2.get_short_url()
 
 @client.event
 async def on_ready():
