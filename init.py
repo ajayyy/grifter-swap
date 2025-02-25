@@ -212,7 +212,8 @@ def make_chart():
                     "gridLines": {
                         "display": True,
                         "color": "#383838",
-                        "zeroLineColor": "#383838"
+                        "zeroLineColor": "#383838",
+                        "lineWidth": 2
                     }
                 }],
                 "xAxes": [{
