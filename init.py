@@ -211,8 +211,8 @@ def make_chart():
                     },
                     "gridLines": {
                         "display": True,
-                        "color": "white",
-                        "zeroLineColor": "white"
+                        "color": "#383838",
+                        "zeroLineColor": "#383838"
                     }
                 }],
                 "xAxes": [{
@@ -259,8 +259,8 @@ def make_chart():
                     },
                     "gridLines": {
                         "display": True,
-                        "color": "white",
-                        "zeroLineColor": "white"
+                        "color": "#383838",
+                        "zeroLineColor": "#383838"
                     }
                 }],
                 "xAxes": [{
