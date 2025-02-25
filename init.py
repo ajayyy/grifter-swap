@@ -181,6 +181,8 @@ def make_chart():
     data = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin2["name"]]).fetchall()
     data2 = connection.execute("SELECT supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
 
+    chart_precision = update_time / 4
+
     processed_data = []
     index = 0
     for t, price, supply in data:
@@ -192,16 +194,16 @@ def make_chart():
         }
 
         if len(processed_data) > 0:
-            while current_data_point["time"] - processed_data[-1]["time"] > update_time:
+            while current_data_point["time"] - processed_data[-1]["time"] > chart_precision:
                 processed_data.append({
-                    "time": processed_data[-1]["time"] + update_time,
+                    "time": processed_data[-1]["time"] + chart_precision,
                     "price": processed_data[-1]["price"],
                     "dab_supply": processed_data[-1]["dab_supply"],
                     "sb_supply": processed_data[-1]["sb_supply"]
                 })
             
             processed_data.append({
-                "time": processed_data[-1]["time"] + update_time,
+                "time": processed_data[-1]["time"] + chart_precision,
                 "price": current_data_point["price"],
                 "dab_supply": current_data_point["dab_supply"],
                 "sb_supply": current_data_point["sb_supply"]
