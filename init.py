@@ -348,7 +348,7 @@ async def on_message(message):
         else:   
             await message.reply(content="You aren't a grifter yet")
     elif message.content.startswith("!suppliers"):
-        supply_info = connection.execute("SELECT coin_name, amount, fees_collected, userID FROM suppliers order by coin_name").fetchall()
+        supply_info = connection.execute("SELECT coin_name, amount, fees_collected, userID FROM suppliers order by coin_name, amount desc").fetchall()
 
         content = ""
         for (coin_name, amount, fees_collected, user_id) in supply_info:
