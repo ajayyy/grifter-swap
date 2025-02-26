@@ -28,7 +28,7 @@ coin2 = {
     "user": "DABCoin#1056",
     "balance": 0,
     "transaction_fee": lambda _: 0,
-    "get_transfer_amount": lambda m: int(re.search(r"transferred (\d+) DABCoins? to <@1343666037551267904>", m).group(1)),
+    "get_transfer_amount": lambda m: int(re.search(r"transferred (\d+) [Dd][aA][bB][cC]oins? to <@1343666037551267904>", m).group(1)),
     "command_id": 1342574310593921027,
     "send": lambda c, m, a, u: c.__call__(channel=m.channel, user=u, amount=a)
 }
