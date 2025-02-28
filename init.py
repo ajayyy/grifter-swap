@@ -379,7 +379,7 @@ async def on_message(message):
             if withdraw_amount <= 0:
                 await message.reply(content="Amount must be greater than 0")
                 return
-        elif withdraw_ask_amount_string.lower() == "all":
+        elif withdraw_ask_amount_string.lower() == "all" or withdraw_ask_amount_string.lower() == "max":
             transaction_fee = coin["transaction_fee"](coin["balance"])
             withdraw_amount = coin["balance"] + transaction_fee
         else:
