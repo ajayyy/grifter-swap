@@ -353,7 +353,7 @@ async def on_message(message):
         content = ""
         for (coin_name, amount, fees_collected, user_id) in supply_info:
             if amount > 0 or fees_collected > 0:
-                content += f"<@{user_id}>: {amount} collecting fees worth {"{:.6f}".format(fees_collected)} in {get_emoji(coin_name)} {coin_name} ({"{:.2f}".format((amount / get_supply(coin_name)) * 100)}% of the supply)\n"
+                content += f"<@{user_id}>: {amount} with fees of {"{:.6f}".format(fees_collected)}({"{:.2f}".format((amount / get_supply(coin_name)) * 100)}%)\n"
 
         await message.reply(content=content, allowed_mentions=discord.AllowedMentions.none())
 
