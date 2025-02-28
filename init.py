@@ -181,7 +181,7 @@ def make_chart():
     data = connection.execute("SELECT time, price, supply FROM history WHERE coin_name = ? ORDER BY time", [coin1["name"]]).fetchall()
     data2 = connection.execute("SELECT supply FROM history WHERE coin_name = ? ORDER BY time", [coin2["name"]]).fetchall()
 
-    chart_precision = update_time / 4
+    chart_precision = update_time
 
     data.append((time.time(), get_conversion(1, coin1, coin2, with_transaction_fee=False, with_rounding=False)[0], coin1["balance"]))
     data2.append((coin2["balance"],))
