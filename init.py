@@ -351,9 +351,16 @@ async def on_message(message):
         supply_info = connection.execute("SELECT coin_name, amount, fees_collected, userID FROM suppliers order by coin_name, amount desc").fetchall()
 
         content = ""
+        last_coin = ""
         for (coin_name, amount, fees_collected, user_id) in supply_info:
-            if amount > 0 or fees_collected > 0:
-                content += f"<@{user_id}>: {coin_name} {amount} with fees of {"{:.6f}".format(fees_collected)}({"{:.2f}".format((amount / get_supply(coin_name)) * 100)}%)\n"
+            different_coin = coin_name != last_coin
+            last_coin = coin_name
+            if different_coin:
+                if content != "":
+                    content += "\n\n"
+                content += f"{get_emoji(coin_name)} {coin_name}:\n"
+            if amount > 0:
+                content += f"<@{user_id}>: {amount} ({"{:.2f}".format((amount / get_supply(coin_name)) * 100)}%) | fee: {"{:.6f}".format(fees_collected)}\n"
 
         await message.reply(content=content, allowed_mentions=discord.AllowedMentions.none())
 
