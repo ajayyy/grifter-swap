@@ -357,7 +357,7 @@ async def on_message(message):
             last_coin = coin_name
             if different_coin:
                 if content != "":
-                    content += "\n\n"
+                    content += "\n"
                 content += f"{get_emoji(coin_name)} {coin_name}:\n"
             if amount > 0:
                 content += f"<@{user_id}>: {amount} ({"{:.2f}".format((amount / get_supply(coin_name)) * 100)}%) | fee: {"{:.6f}".format(fees_collected)}\n"
