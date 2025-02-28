@@ -346,7 +346,7 @@ async def on_message(message):
             supply_info = "\n".join([f"{get_emoji(coin_name)} {coin_name}: {amount} collecting fees worth {"{:.6f}".format(fees_collected)} {get_emoji(coin_name)} {coin_name}" for coin_name, amount, fees_collected in supply_info])
             await message.reply(content=f"Your supply:\n{supply_info}")
         else:   
-            await message.reply(content="You aren't a grifter yet")
+            await message.reply(content="You aren't a supplier yet")
     elif message.content.startswith("!suppliers"):
         supply_info = connection.execute("SELECT coin_name, amount, fees_collected, userID FROM suppliers order by coin_name, amount desc").fetchall()
 
