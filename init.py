@@ -378,11 +378,19 @@ async def on_message(message):
             await message.reply(content="Invalid coin")
             return
         
-        withdraw_ask_amount = int(args[2])
-        transaction_fee = coin["transaction_fee"](withdraw_ask_amount)
-        withdraw_amount = withdraw_ask_amount + transaction_fee
-        if withdraw_amount <= 0:
-            await message.reply(content="Amount must be greater than 0")
+        withdraw_ask_amount_string = args[2]
+        if withdraw_ask_amount_string.isdigit():
+            withdraw_amount = int(withdraw_ask_amount_string)
+            transaction_fee = coin["transaction_fee"](withdraw_ask_amount_string)
+            withdraw_amount = withdraw_ask_amount_string + transaction_fee
+            if withdraw_amount <= 0:
+                await message.reply(content="Amount must be greater than 0")
+                return
+        elif withdraw_ask_amount_string.lower() == "all" or withdraw_ask_amount_string.lower() == "max":
+            transaction_fee = coin["transaction_fee"](coin["balance"])
+            withdraw_amount = coin["balance"] + transaction_fee
+        else:
+            await message.reply(content="Invalid amount")
             return
         
         amount, fees_collected = connection.execute("SELECT SUM(amount + fees_collected) as amount, fees_collected FROM suppliers WHERE userID = ? AND coin_name = ?", [message.author.id, coin["name"]]).fetchone()
@@ -404,8 +412,27 @@ async def on_message(message):
 
             add_to_balance(coin, -withdraw_amount)
             await message.reply(content=f"Withdrew {withdraw_amount} {coin['emoji']} {coin['name']} from the supply{f' with {transaction_fee} {coin["emoji"]} {coin["name"]} transaction fee' if transaction_fee else ''}")
+            
+            await send(message, message.author, coin, withdraw_ask_amount_string)
+    elif message.content.startswith("!forget"):
+        args = message.content.split(" ")
+        if len(args) > 2:
+            await message.reply(content="Too many arguments")
+            return
+        coin_1_balance = coin1["balance"]
+        coin_1_balance_rounded = math.ceil(coin_1_balance)
+        coin_2_balance = coin2["balance"]
+        coin_2_balance_rounded = math.ceil(coin_2_balance)
+        
+        force = args[1] == "force"
+        if (coin_1_balance_rounded == 0 and coin_2_balance_rounded == 0) or force:
+            # TODO Spread out the user's remaining coin fractions to the remaining suppliers
+            connection.execute("DELETE FROM suppliers WHERE userID = ?", [message.author.id])
+            connection.commit()
+            await message.reply(content="You have been forgotten")
+        else:
+            await message.reply(content="You must have less than 1 balance in both coins to be forgotten")
 
-            await send(message, message.author, coin, withdraw_ask_amount)
 
 @client.event
 async def on_raw_reaction_add(reaction):
